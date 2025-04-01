@@ -1,0 +1,126 @@
+/* /frontend/css/style.css */
+
+/* Corpo geral */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f9;
+}
+
+/* Título principal */
+h1 {
+    font-size: 2.5rem;
+    color: #4caf50;
+    margin-bottom: 40px;
+}
+
+/* Ajustes para o card (Adicionar novo aluno, turma, etc.) */
+.card {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Card Header */
+.card-header {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Botões */
+.btn {
+    border-radius: 5px;
+}
+
+/* Botões de ação: Editar, Excluir */
+.btn-warning, .btn-danger {
+    font-size: 0.9rem;
+}
+
+.btn-sm {
+    padding: 0.3rem 0.6rem;
+}
+
+/* Tabela de listagem */
+.table {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.table th {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+/* Formulário */
+.form-label {
+    font-weight: bold;
+}
+
+.form-control {
+    border-radius: 5px;
+    padding: 0.8rem;
+}
+
+/* Alertas de SweetAlert */
+.swal2-popup {
+    font-size: 1.2rem;
+    border-radius: 10px;
+}
+
+.swal2-title {
+    font-size: 1.5rem;
+}
+
+/* Formatação para o Footer */
+footer {
+    background-color: #343a40;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+/* Estilo de resposta e resultados */
+.alert-custom {
+    font-size: 1.1rem;
+    color: #fff;
+    background-color: #28a745;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.alert-custom-error {
+    background-color: #dc3545;
+}
+
+.alert-custom-success {
+    background-color: #007bff;
+}
+
+/* Ajustes para a Navegação */
+.navbar {
+    background-color: #007bff;
+}
+
+.navbar a {
+    color: white;
+}
+
+.navbar a:hover {
+    color: #f1f1f1;
+}
+
+/*<link rel="stylesheet" href="/frontend/css/style.css">
