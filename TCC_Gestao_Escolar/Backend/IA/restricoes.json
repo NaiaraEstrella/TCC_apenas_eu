@@ -1,0 +1,12 @@
+{
+    "dias_letivos": ["segunda", "terça", "quarta", "quinta", "sexta"],
+    "aulas_por_dia": 5,
+    "disciplinas_com_aulas_geminadas": ["Português", "Matemática", "Ciências"],
+    "maximo_de_aulas_geminadas": 2,
+    "restricoes": {
+      "evitar_primeiro_horario": [],
+      "professores_nao_podem_estar_em_duas_turmas_ao_mesmo_tempo": true,
+      "professor_tempo_minimo_intervalo_entre_turmas": 0
+    }
+  }
+  

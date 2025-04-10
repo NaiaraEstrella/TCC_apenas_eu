@@ -1,0 +1,166 @@
+<!-- /frontend/pages/faltas.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Faltas - Gestão Escolar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Gerenciamento de Faltas</h1>
+
+        <!-- Formulário para registrar nova falta -->
+        <div class="row mt-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5>Registrar Nova Falta</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="formRegistrarFalta">
+                            <div class="mb-3">
+                                <label for="idAluno" class="form-label">Aluno</label>
+                                <select class="form-select" id="idAluno" required>
+                                    <!-- Alunos serão carregados aqui -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="dataFalta" class="form-label">Data da Falta</label>
+                                <input type="date" class="form-control" id="dataFalta" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="descricaoFalta" class="form-label">Motivo</label>
+                                <textarea class="form-control" id="descricaoFalta" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">Registrar Falta</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de faltas -->
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5>Lista de Faltas</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Aluno</th>
+                                    <th>Data</th>
+                                    <th>Motivo</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaFaltas">
+                                <!-- Faltas serão listadas aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Função para listar faltas
+        function listarFaltas() {
+            fetch('/api/faltas')
+                .then(response => response.json())
+                .then(data => {
+                    const listaFaltas = document.getElementById('listaFaltas');
+                    listaFaltas.innerHTML = '';
+                    data.forEach(falta => {
+                        listaFaltas.innerHTML += `
+                            <tr>
+                                <td>${falta.aluno.nome}</td>
+                                <td>${falta.data}</td>
+                                <td>${falta.motivo}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarFalta(${falta.id})">Editar</button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirFalta(${falta.id})">Excluir</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        // Função para carregar alunos no select
+        function carregarAlunos() {
+            fetch('/api/alunos')
+                .then(response => response.json())
+                .then(data => {
+                    const idAluno = document.getElementById('idAluno');
+                    data.forEach(aluno => {
+                        const option = document.createElement('option');
+                        option.value = aluno.id;
+                        option.textContent = aluno.nome;
+                        idAluno.appendChild(option);
+                    });
+                });
+        }
+
+        // Função para registrar falta
+        document.getElementById('formRegistrarFalta').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const idAluno = document.getElementById('idAluno').value;
+            const dataFalta = document.getElementById('dataFalta').value;
+            const descricaoFalta = document.getElementById('descricaoFalta').value;
+
+            fetch('/api/faltas/adicionar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ idAluno, data: dataFalta, motivo: descricaoFalta }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire('Sucesso!', 'Falta registrada com sucesso!', 'success');
+                listarFaltas();
+            })
+            .catch(error => {
+                Swal.fire('Erro!', 'Erro ao registrar falta', 'error');
+            });
+        });
+
+        // Função para excluir falta
+        function excluirFalta(id) {
+            fetch(`/api/faltas/excluir/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire('Sucesso!', 'Falta excluída com sucesso!', 'success');
+                listarFaltas();
+            })
+            .catch(error => {
+                Swal.fire('Erro!', 'Erro ao excluir falta', 'error');
+            });
+        }
+
+        // Função para editar falta
+        function editarFalta(id) {
+            // A lógica de edição pode ser implementada aqui com um pop-up ou redirecionamento
+            Swal.fire('Funcionalidade em desenvolvimento');
+        }
+
+        // Carrega os alunos e lista as faltas na página
+        carregarAlunos();
+        listarFaltas();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

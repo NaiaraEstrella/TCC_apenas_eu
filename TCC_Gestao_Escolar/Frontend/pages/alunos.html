@@ -1,0 +1,181 @@
+<!-- /frontend/pages/alunos.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Alunos - Gestão Escolar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Gerenciamento de Alunos</h1>
+
+        <!-- Formulário para adicionar novo aluno -->
+        <div class="row mt-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5>Adicionar Novo Aluno</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="formAdicionarAluno">
+                            <div class="mb-3">
+                                <label for="nomeAluno" class="form-label">Nome</label>
+                                <input type="text" class="form-control" id="nomeAluno" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="emailAluno" class="form-label">E-mail</label>
+                                <input type="email" class="form-control" id="emailAluno" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="turmaAluno" class="form-label">Turma</label>
+                                <input type="text" class="form-control" id="turmaAluno" required>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">Adicionar Aluno</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de alunos -->
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5>Lista de Alunos</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Turma</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaAlunos">
+                                <!-- Alunos serão listados aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Função para listar alunos
+        function listarAlunos() {
+            fetch('/api/alunos')
+                .then(response => response.json())
+                .then(data => {
+                    const listaAlunos = document.getElementById('listaAlunos');
+                    listaAlunos.innerHTML = '';
+                    data.forEach(aluno => {
+                        listaAlunos.innerHTML += `
+                            <tr>
+                                <td>${aluno.nome}</td>
+                                <td>${aluno.email}</td>
+                                <td>${aluno.turma}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarAluno(${aluno.id})">Editar</button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirAluno(${aluno.id})">Excluir</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch(error => {
+                    Swal.fire('Erro!', 'Erro ao carregar lista de alunos', 'error');
+                });
+        }
+
+        // Função para adicionar aluno
+        document.getElementById('formAdicionarAluno').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('nomeAluno').value;
+            const email = document.getElementById('emailAluno').value;
+            const turma = document.getElementById('turmaAluno').value;
+
+            fetch('/api/alunos/adicionar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nome, email, turma }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire('Sucesso!', 'Aluno adicionado com sucesso!', 'success');
+                listarAlunos(); // Atualiza a lista de alunos
+            })
+            .catch(error => {
+                Swal.fire('Erro!', 'Erro ao adicionar aluno', 'error');
+            });
+        });
+
+        // Função para excluir aluno
+        function excluirAluno(id) {
+            fetch(`/api/alunos/excluir/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire('Sucesso!', 'Aluno excluído com sucesso!', 'success');
+                listarAlunos(); // Atualiza a lista de alunos
+            })
+            .catch(error => {
+                Swal.fire('Erro!', 'Erro ao excluir aluno', 'error');
+            });
+        }
+
+        // Função para editar aluno
+        function editarAluno(id) {
+            fetch(`/api/alunos/${id}`)
+                .then(response => response.json())
+                .then(aluno => {
+                    document.getElementById('nomeAluno').value = aluno.nome;
+                    document.getElementById('emailAluno').value = aluno.email;
+                    document.getElementById('turmaAluno').value = aluno.turma;
+                    // Aqui, você pode alterar a lógica para salvar as alterações do aluno
+                    document.getElementById('formAdicionarAluno').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        fetch(`/api/alunos/editar/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                nome: document.getElementById('nomeAluno').value,
+                                email: document.getElementById('emailAluno').value,
+                                turma: document.getElementById('turmaAluno').value,
+                            }),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            Swal.fire('Sucesso!', 'Aluno editado com sucesso!', 'success');
+                            listarAlunos(); // Atualiza a lista de alunos
+                        })
+                        .catch(error => {
+                            Swal.fire('Erro!', 'Erro ao editar aluno', 'error');
+                        });
+                    });
+                })
+                .catch(error => {
+                    Swal.fire('Erro!', 'Erro ao carregar os dados do aluno', 'error');
+                });
+        }
+
+        // Chama a função para listar alunos na página
+        listarAlunos();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

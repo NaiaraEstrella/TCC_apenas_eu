@@ -1,0 +1,140 @@
+<!-- /frontend/pages/turmas.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Turmas - Gestão Escolar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Gerenciamento de Turmas</h1>
+
+        <!-- Formulário para adicionar nova turma -->
+        <div class="row mt-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5>Adicionar Nova Turma</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="formAdicionarTurma">
+                            <div class="mb-3">
+                                <label for="nomeTurma" class="form-label">Nome da Turma</label>
+                                <input type="text" class="form-control" id="nomeTurma" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="descricaoTurma" class="form-label">Descrição</label>
+                                <input type="text" class="form-control" id="descricaoTurma" required>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">Adicionar Turma</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de turmas -->
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5>Lista de Turmas</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaTurmas">
+                                <!-- Turmas serão listadas aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Função para listar turmas
+        function listarTurmas() {
+            fetch('/api/turmas')
+                .then(response => response.json())
+                .then(data => {
+                    const listaTurmas = document.getElementById('listaTurmas');
+                    listaTurmas.innerHTML = '';
+                    data.forEach(turma => {
+                        listaTurmas.innerHTML += `
+                            <tr>
+                                <td>${turma.nome}</td>
+                                <td>${turma.descricao}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarTurma(${turma.id})">Editar</button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirTurma(${turma.id})">Excluir</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        // Função para adicionar turma
+        document.getElementById('formAdicionarTurma').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('nomeTurma').value;
+            const descricao = document.getElementById('descricaoTurma').value;
+
+            fetch('/api/turmas/adicionar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nome, descricao }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire('Sucesso!', 'Turma adicionada com sucesso!', 'success');
+                listarTurmas();
+            })
+            .catch(error => {
+                Swal.fire('Erro!', 'Erro ao adicionar turma', 'error');
+            });
+        });
+
+        // Função para excluir turma
+        function excluirTurma(id) {
+            fetch(`/api/turmas/excluir/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire('Sucesso!', 'Turma excluída com sucesso!', 'success');
+                listarTurmas();
+            })
+            .catch(error => {
+                Swal.fire('Erro!', 'Erro ao excluir turma', 'error');
+            });
+        }
+
+        // Função para editar turma
+        function editarTurma(id) {
+            // A lógica de edição pode ser implementada aqui com um pop-up ou redirecionamento
+            Swal.fire('Funcionalidade em desenvolvimento');
+        }
+
+        // Chama a função para listar turmas na página
+        listarTurmas();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!-- /frontend/pages/dashboard.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gestão Escolar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Para gráficos -->
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Dashboard - Gestão Escolar</h1>
+
+        <!-- Gráficos de Dados -->
+        <div class="row mt-5">
+            <!-- Gráfico de Alunos -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5>Total de Alunos</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="graficoAlunos"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Faltas -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-warning text-white">
+                        <h5>Total de Faltas</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="graficoFaltas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumo de Informações -->
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5>Total de Professores</h5>
+                    </div>
+                    <div class="card-body">
+                        <p id="totalProfessores">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5>Total de Turmas</h5>
+                    </div>
+                    <div class="card-body">
+                        <p id="totalTurmas">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5>Total de Faltas</h5>
+                    </div>
+                    <div class="card-body">
+                        <p id="totalFaltas">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Função para carregar dados para o gráfico de alunos
+        function carregarGraficoAlunos() {
+            fetch('/api/alunos')
+                .then(response => response.json())
+                .then(data => {
+                    const graficoAlunos = document.getElementById('graficoAlunos').getContext('2d');
+                    const chart = new Chart(graficoAlunos, {
+                        type: 'bar', // Tipo de gráfico (pode ser 'line', 'bar', etc.)
+                        data: {
+                            labels: ['Alunos'],
+                            datasets: [{
+                                label: 'Número de Alunos',
+                                data: [data.length], // Total de alunos
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
+        }
+
+        // Função para carregar dados para o gráfico de faltas
+        function carregarGraficoFaltas() {
+            fetch('/api/faltas')
+                .then(response => response.json())
+                .then(data => {
+                    const graficoFaltas = document.getElementById('graficoFaltas').getContext('2d');
+                    const chart = new Chart(graficoFaltas, {
+                        type: 'line', // Tipo de gráfico
+                        data: {
+                            labels: data.map(falta => falta.data), // Supondo que você tenha uma data nas faltas
+                            datasets: [{
+                                label: 'Faltas Registradas',
+                                data: data.map(falta => falta.quantidade), // Número de faltas
+                                fill: false,
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Data'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
+        }
+
+        // Função para carregar totais
+        function carregarTotais() {
+            fetch('/api/professores/total')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalProfessores').textContent = data.total;
+                })
+                .catch(error => {
+                    document.getElementById('totalProfessores').textContent = 'Erro ao carregar';
+                });
+
+            fetch('/api/turmas/total')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalTurmas').textContent = data.total;
+                })
+                .catch(error => {
+                    document.getElementById('totalTurmas').textContent = 'Erro ao carregar';
+                });
+
+            fetch('/api/faltas/total')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalFaltas').textContent = data.total;
+                })
+                .catch(error => {
+                    document.getElementById('totalFaltas').textContent = 'Erro ao carregar';
+                });
+        }
+
+        // Carregar todos os dados na inicialização
+        window.onload = function() {
+            carregarGraficoAlunos();
+            carregarGraficoFaltas();
+            carregarTotais();
+        };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
