@@ -1,0 +1,147 @@
+<!-- /frontend/pages/professores.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Professores - Gestão Escolar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Gerenciamento de Professores</h1>
+
+        <!-- Formulário para adicionar novo professor -->
+        <div class="row mt-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5>Adicionar Novo Professor</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="formAdicionarProfessor">
+                            <div class="mb-3">
+                                <label for="nomeProfessor" class="form-label">Nome</label>
+                                <input type="text" class="form-control" id="nomeProfessor" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="emailProfessor" class="form-label">E-mail</label>
+                                <input type="email" class="form-control" id="emailProfessor" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="disciplinasProfessor" class="form-label">Disciplinas</label>
+                                <input type="text" class="form-control" id="disciplinasProfessor" required>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">Adicionar Professor</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de professores -->
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5>Lista de Professores</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Disciplinas</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaProfessores">
+                                <!-- Professores serão listados aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Função para listar professores
+        function listarProfessores() {
+            fetch('/api/professores')
+                .then(response => response.json())
+                .then(data => {
+                    const listaProfessores = document.getElementById('listaProfessores');
+                    listaProfessores.innerHTML = '';
+                    data.forEach(professor => {
+                        listaProfessores.innerHTML += `
+                            <tr>
+                                <td>${professor.nome}</td>
+                                <td>${professor.email}</td>
+                                <td>${professor.disciplinas}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarProfessor(${professor.id})">Editar</button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirProfessor(${professor.id})">Excluir</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                });
+        }
+
+        // Função para adicionar professor
+        document.getElementById('formAdicionarProfessor').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('nomeProfessor').value;
+            const email = document.getElementById('emailProfessor').value;
+            const disciplinas = document.getElementById('disciplinasProfessor').value;
+
+            fetch('/api/professores/adicionar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nome, email, disciplinas }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire('Sucesso!', 'Professor adicionado com sucesso!', 'success');
+                listarProfessores();
+            })
+            .catch(error => {
+                Swal.fire('Erro!', 'Erro ao adicionar professor', 'error');
+            });
+        });
+
+        // Função para excluir professor
+        function excluirProfessor(id) {
+            fetch(`/api/professores/excluir/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire('Sucesso!', 'Professor excluído com sucesso!', 'success');
+                listarProfessores();
+            })
+            .catch(error => {
+                Swal.fire('Erro!', 'Erro ao excluir professor', 'error');
+            });
+        }
+
+        // Função para editar professor
+        function editarProfessor(id) {
+            // A lógica de edição pode ser implementada aqui com um pop-up ou redirecionamento
+            Swal.fire('Funcionalidade em desenvolvimento');
+        }
+
+        // Chama a função para listar professores na página
+        listarProfessores();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
